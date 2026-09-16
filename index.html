@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Surprise pour Meryem ✨</title>
+  <!-- مكتبة الدردشة المباشرة أونلاين -->
+  <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -22,7 +24,7 @@
       padding: 25px 20px;
       border-radius: 24px;
       box-shadow: 0 15px 35px rgba(233, 30, 99, 0.25);
-      max-width: 350px;
+      max-width: 360px;
       width: 100%;
     }
     h1 {
@@ -40,7 +42,7 @@
     }
     .img-container img {
       width: 100%;
-      height: 350px;
+      height: 330px;
       object-fit: cover;
       display: block;
     }
@@ -63,7 +65,7 @@
     }
     #step-2 {
       display: none;
-      margin-top: 20px;
+      margin-top: 15px;
       padding-top: 15px;
       border-top: 2px dashed #ffb6c1;
     }
@@ -71,13 +73,14 @@
       color: #e91e63;
       font-size: 18px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
+    /* تصميم صندوق المحادثة المباشرة */
     .chat-box {
       background: #fff0f5;
       border-radius: 15px;
       padding: 12px;
-      max-height: 250px;
+      height: 220px;
       overflow-y: auto;
       text-align: left;
       margin-bottom: 12px;
@@ -86,9 +89,10 @@
     .chat-msg {
       margin: 8px 0;
       padding: 8px 12px;
-      border-radius: 12px;
+      border-radius: 14px;
       font-size: 14px;
-      max-width: 85%;
+      max-width: 80%;
+      word-wrap: break-word;
     }
     .msg-med {
       background: #e91e63;
@@ -109,10 +113,16 @@
     }
     .chat-input input {
       flex: 1;
-      padding: 10px;
+      padding: 10px 14px;
       border: 2px solid #ffccd5;
       border-radius: 20px;
       outline: none;
+      font-size: 14px;
+    }
+    .identity-selector {
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: #666;
     }
   </style>
 </head>
@@ -121,61 +131,97 @@
   <div class="card">
     <h1>Surprise pour Meryem ✨</h1>
 
-    <!-- صورتك الشخصية المرفوعة باسم medoud.jpg -->
+    <!-- صورتك المرفوعة باسم medoud.jpg -->
     <div class="img-container">
       <img src="medoud.jpg" onerror="this.src='medoud.JPG'; this.onerror=function(){this.src='medoud.png';}" alt="Photo de Mohamed">
     </div>
 
-    <!-- السؤال الأول -->
+    <!-- السؤال الأول (المفاجأة الأولى) -->
     <div id="step-1">
       <div class="q-title">هل انتي تعشقين فيا 😂🤣؟</div>
       <div class="btn-group">
-        <button class="btn" onclick="startChat('Oui 💕')">Oui 💕</button>
-        <button class="btn" onclick="startChat('Non 😅')">Non 😅</button>
+        <button class="btn" onclick="answerQuestion1('Oui 💕')">Oui 💕</button>
+        <button class="btn" onclick="answerQuestion1('Non 😅')">Non 😅</button>
       </div>
     </div>
 
-    <!-- السؤال الثاني والتفاعل أونلاين في الصفحة -->
+    <!-- السؤال الثاني والدردشة المباشرة أونلاين -->
     <div id="step-2">
-      <div class="chat-box" id="chat-box">
-        <!-- الدردشة تظهر هنا -->
+      <div class="q-title">raki ghya maryoma ? 🌸</div>
+      
+      <!-- اختيار من يتحدث في الشات (أنت أو هي) -->
+      <div class="identity-selector">
+        <label><input type="radio" name="userRole" value="Meryem" checked> Meryem</label>
+        <label style="margin-left: 15px;"><input type="radio" name="userRole" value="Mohamed"> Mohamed</label>
       </div>
 
+      <div class="chat-box" id="chat-box"></div>
+
       <div class="chat-input">
-        <input type="text" id="meryem-msg" placeholder="Écris ta réponse ici...">
-        <button class="btn" onclick="sendMsg()">Envoyer</button>
+        <input type="text" id="chat-input-text" placeholder="Écris un message..." onkeypress="if(event.key==='Enter') sendLiveMessage()">
+        <button class="btn" onclick="sendLiveMessage()">Envoyer</button>
       </div>
     </div>
   </div>
 
   <script>
-    let meryemChoice = '';
+    // إعداد سيرفر الدردشة المباشر (PubNub Demo Keys)
+    const pubnub = new PubNub({
+      publishKey: 'demo',
+      subscribeKey: 'demo',
+      userId: 'user_' + Math.floor(Math.random() * 1000)
+    });
 
-    function startChat(choice) {
-      meryemChoice = choice;
+    const channelName = 'meryem_med_private_chat';
+
+    pubnub.subscribe({ channels: [channelName] });
+
+    pubnub.addListener({
+      message: function(m) {
+        displayMessage(m.message.sender, m.message.text);
+      }
+    });
+
+    function answerQuestion1(choice) {
       document.getElementById('step-1').style.display = 'none';
       document.getElementById('step-2').style.display = 'block';
 
-      const box = document.getElementById('chat-box');
-      box.innerHTML += `<div class="chat-msg msg-meryem"><b>Meryem:</b> ${choice}</div>`;
-      box.innerHTML += `<div class="chat-msg msg-med"><b>Mohamed:</b> raki ghya maryoma ? 🌸</div>`;
-      box.scrollTop = box.scrollHeight;
+      // إرسال الإجابة الأولى للشات تلقائياً
+      pubnub.publish({
+        channel: channelName,
+        message: { sender: 'Meryem', text: `Réponse: ${choice}` }
+      });
     }
 
-    function sendMsg() {
-      const input = document.getElementById('meryem-msg');
-      const val = input.value.trim();
-      if (!val) return;
+    function sendLiveMessage() {
+      const input = document.getElementById('chat-input-text');
+      const text = input.value.trim();
+      if (!text) return;
 
-      const box = document.getElementById('chat-box');
-      box.innerHTML += `<div class="chat-msg msg-meryem"><b>Meryem:</b> ${val}</div>`;
+      const role = document.querySelector('input[name="userRole"]:checked').value;
+
+      pubnub.publish({
+        channel: channelName,
+        message: { sender: role, text: text }
+      });
+
       input.value = '';
+    }
 
-      // رد تلقائي في الصفحة بعد أن تجيب مريم
-      setTimeout(() => {
-        box.innerHTML += `<div class="chat-msg msg-med"><b>Mohamed:</b> 💖 NABGHIK MARYOMAA 💖</div>`;
-        box.scrollTop = box.scrollHeight;
-      }, 700);
+    function displayMessage(sender, text) {
+      const box = document.getElementById('chat-box');
+      const msgDiv = document.createElement('div');
+      
+      if (sender === 'Mohamed') {
+        msgDiv.className = 'chat-msg msg-med';
+        msgDiv.innerHTML = `<b>Mohamed:</b> ${text}`;
+      } else {
+        msgDiv.className = 'chat-msg msg-meryem';
+        msgDiv.innerHTML = `<b>Meryem:</b> ${text}`;
+      }
+
+      box.appendChild(msgDiv);
+      box.scrollTop = box.scrollHeight;
     }
   </script>
 
