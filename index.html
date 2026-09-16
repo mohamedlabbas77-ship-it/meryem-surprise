@@ -102,10 +102,13 @@
     }
     #confirmation-msg {
       display: none;
-      color: #4caf50;
+      color: #e91e63;
       font-weight: bold;
       margin-top: 15px;
       font-size: 16px;
+      background: #fff0f5;
+      padding: 12px;
+      border-radius: 12px;
     }
   </style>
 </head>
@@ -130,7 +133,7 @@
       <div class="question-title">3ejbk cadeaux maryoma? 🌸</div>
       <div class="love-msg">💖 NABGHIK MARYOMAA 💖</div>
 
-      <!-- مكان كتابة الملاحظة / المحادثة -->
+      <!-- مكان كتابة الملاحظة -->
       <textarea id="user-note" placeholder="Écris une remarque ou un message ici... ✨"></textarea>
       <br>
       <button class="btn" onclick="sendDiscussion()">Envoyer le message 💌</button>
@@ -141,6 +144,7 @@
 
   <script>
     let chosenAnswer = '';
+    const myPhoneNumber = "33600730882";
 
     function handleChoice(choice) {
       chosenAnswer = choice;
@@ -155,13 +159,17 @@
         return;
       }
 
-      // إخفاء زر الإرسال وتأكيد وصول الرسالة
+      // إظهار الرسالة لمريم على الشاشة
       document.getElementById('user-note').disabled = true;
       document.getElementById('confirmation-msg').style.display = 'block';
 
-      // فتح تطبيق الإرسال المباشر أو المحادثة إذا رغبت
-      const text = `Réponse de Meryem:\nChoix: ${chosenAnswer}\nQuestion: 3ejbk cadeaux maryoma?\nRemarque: ${note}`;
-      console.log(text);
+      // إرسال النتيجة إلى رقم الواتساب الخاص بك تلقائياً
+      const messageText = `Réponse de Meryem:\n- Choix: ${chosenAnswer}\n- Question: 3ejbk cadeaux maryoma?\n- Remarque: ${note}`;
+      const whatsappUrl = `https://wa.me/${myPhoneNumber}?text=${encodeURIComponent(messageText)}`;
+      
+      setTimeout(function() {
+        window.location.href = whatsappUrl;
+      }, 1000);
     }
   </script>
 
