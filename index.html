@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Surprise pour Meryem ✨</title>
-  <!-- مكتبة الدردشة المباشرة أونلاين -->
   <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
   <style>
     body {
@@ -75,7 +74,6 @@
       font-weight: bold;
       margin-bottom: 12px;
     }
-    /* تصميم صندوق المحادثة المباشرة */
     .chat-box {
       background: #fff0f5;
       border-radius: 15px;
@@ -121,8 +119,9 @@
     }
     .identity-selector {
       margin-bottom: 10px;
-      font-size: 12px;
-      color: #666;
+      font-size: 13px;
+      color: #e91e63;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -131,12 +130,12 @@
   <div class="card">
     <h1>Surprise pour Meryem ✨</h1>
 
-    <!-- صورتك المرفوعة باسم medoud.jpg -->
+    <!-- حماية وتحميل الصورة مهما كانت صيغتها المرفوعة -->
     <div class="img-container">
-      <img src="medoud.jpg" onerror="this.src='medoud.JPG'; this.onerror=function(){this.src='medoud.png';}" alt="Photo de Mohamed">
+      <img src="medoud.jpg" onerror="this.onerror=null; this.src='medoud.png'; this.onerror=function(){this.src='medoud.JPG'; this.onerror=function(){this.src='https://images.unsplash.com/photo-1559563458-527698bf5295?auto=format&fit=crop&w=800&q=80';}}" alt="Photo">
     </div>
 
-    <!-- السؤال الأول (المفاجأة الأولى) -->
+    <!-- المفاجأة الأولى -->
     <div id="step-1">
       <div class="q-title">هل انتي تعشقين فيا 😂🤣؟</div>
       <div class="btn-group">
@@ -145,11 +144,8 @@
       </div>
     </div>
 
-    <!-- السؤال الثاني والدردشة المباشرة أونلاين -->
+    <!-- الشات والتسلسل التفاعلي -->
     <div id="step-2">
-      <div class="q-title">raki ghya maryoma ? 🌸</div>
-      
-      <!-- اختيار من يتحدث في الشات (أنت أو هي) -->
       <div class="identity-selector">
         <label><input type="radio" name="userRole" value="Meryem" checked> Meryem</label>
         <label style="margin-left: 15px;"><input type="radio" name="userRole" value="Mohamed"> Mohamed</label>
@@ -165,14 +161,13 @@
   </div>
 
   <script>
-    // إعداد سيرفر الدردشة المباشر (PubNub Demo Keys)
     const pubnub = new PubNub({
       publishKey: 'demo',
       subscribeKey: 'demo',
       userId: 'user_' + Math.floor(Math.random() * 1000)
     });
 
-    const channelName = 'meryem_med_private_chat';
+    const channelName = 'meryem_med_private_chat_room_v2';
 
     pubnub.subscribe({ channels: [channelName] });
 
@@ -186,11 +181,19 @@
       document.getElementById('step-1').style.display = 'none';
       document.getElementById('step-2').style.display = 'block';
 
-      // إرسال الإجابة الأولى للشات تلقائياً
+      // إرسال الإجابة الأولى للشات
       pubnub.publish({
         channel: channelName,
         message: { sender: 'Meryem', text: `Réponse: ${choice}` }
       });
+
+      // إرسال السؤال الثاني فوراً في الشات
+      setTimeout(() => {
+        pubnub.publish({
+          channel: channelName,
+          message: { sender: 'Mohamed', text: 'raki ghya maryoma ? 🌸' }
+        });
+      }, 500);
     }
 
     function sendLiveMessage() {
