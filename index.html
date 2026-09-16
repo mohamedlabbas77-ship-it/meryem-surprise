@@ -24,12 +24,10 @@
       box-shadow: 0 15px 35px rgba(233, 30, 99, 0.25);
       max-width: 350px;
       width: 100%;
-      backdrop-filter: blur(5px);
     }
     h1 {
       color: #e91e63;
       font-size: 22px;
-      margin-top: 5px;
       margin-bottom: 15px;
     }
     .img-container {
@@ -56,59 +54,65 @@
       background: linear-gradient(45deg, #ff2a75, #ff6090);
       color: white;
       border: none;
-      padding: 12px 26px;
-      font-size: 16px;
+      padding: 12px 24px;
+      font-size: 15px;
       font-weight: bold;
       border-radius: 50px;
       cursor: pointer;
       box-shadow: 0 5px 15px rgba(255, 42, 117, 0.4);
-      transition: all 0.2s ease;
     }
-    .btn:active {
-      transform: scale(0.95);
-    }
-    #next-step {
+    #step-2 {
       display: none;
       margin-top: 20px;
       padding-top: 15px;
       border-top: 2px dashed #ffb6c1;
     }
-    .question-title {
+    .q-title {
       color: #e91e63;
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-    .love-msg {
-      color: #d81b60;
       font-size: 18px;
       font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
-    textarea {
-      width: 90%;
-      height: 80px;
-      border: 2px solid #ffccd5;
-      border-radius: 12px;
-      padding: 10px;
-      font-family: inherit;
-      font-size: 14px;
-      resize: none;
-      outline: none;
-      margin-bottom: 12px;
-    }
-    textarea:focus {
-      border-color: #e91e63;
-    }
-    #confirmation-msg {
-      display: none;
-      color: #e91e63;
-      font-weight: bold;
-      margin-top: 15px;
-      font-size: 16px;
+    .chat-box {
       background: #fff0f5;
+      border-radius: 15px;
       padding: 12px;
+      max-height: 250px;
+      overflow-y: auto;
+      text-align: left;
+      margin-bottom: 12px;
+      border: 1px solid #ffccd5;
+    }
+    .chat-msg {
+      margin: 8px 0;
+      padding: 8px 12px;
       border-radius: 12px;
+      font-size: 14px;
+      max-width: 85%;
+    }
+    .msg-med {
+      background: #e91e63;
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 2px;
+    }
+    .msg-meryem {
+      background: #ffffff;
+      color: #333;
+      margin-right: auto;
+      border: 1px solid #ffccd5;
+      border-bottom-left-radius: 2px;
+    }
+    .chat-input {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #ffccd5;
+      border-radius: 20px;
+      outline: none;
     }
   </style>
 </head>
@@ -117,59 +121,61 @@
   <div class="card">
     <h1>Surprise pour Meryem ✨</h1>
 
-    <!-- صورة وردة رائعة جداً -->
+    <!-- صورتك الشخصية المرفوعة باسم medoud.jpg -->
     <div class="img-container">
-      <img src="https://images.unsplash.com/photo-1559563458-527698bf5295?auto=format&fit=crop&w=800&q=80" alt="Rose for Meryem">
+      <img src="medoud.jpg" onerror="this.src='medoud.JPG'; this.onerror=function(){this.src='medoud.png';}" alt="Photo de Mohamed">
     </div>
 
-    <!-- أزرار Oui / Non أسفل الوردة مباشرة -->
-    <div id="initial-buttons" class="btn-group">
-      <button class="btn" onclick="handleChoice('Oui')">Oui 💕</button>
-      <button class="btn" onclick="handleChoice('Non')">Non 😅</button>
+    <!-- السؤال الأول -->
+    <div id="step-1">
+      <div class="q-title">هل انتي تعشقين فيا 😂🤣؟</div>
+      <div class="btn-group">
+        <button class="btn" onclick="startChat('Oui 💕')">Oui 💕</button>
+        <button class="btn" onclick="startChat('Non 😅')">Non 😅</button>
+      </div>
     </div>
 
-    <!-- الجزء التفاعلي الذي يظهر بعد الضغط -->
-    <div id="next-step">
-      <div class="question-title">3ejbk cadeaux maryoma? 🌸</div>
-      <div class="love-msg">💖 NABGHIK MARYOMAA 💖</div>
+    <!-- السؤال الثاني والتفاعل أونلاين في الصفحة -->
+    <div id="step-2">
+      <div class="chat-box" id="chat-box">
+        <!-- الدردشة تظهر هنا -->
+      </div>
 
-      <!-- مكان كتابة الملاحظة -->
-      <textarea id="user-note" placeholder="Écris une remarque ou un message ici... ✨"></textarea>
-      <br>
-      <button class="btn" onclick="sendDiscussion()">Envoyer le message 💌</button>
-      
-      <div id="confirmation-msg">Merci Maryoma ! Votre message a été envoyé ✨💖</div>
+      <div class="chat-input">
+        <input type="text" id="meryem-msg" placeholder="Écris ta réponse ici...">
+        <button class="btn" onclick="sendMsg()">Envoyer</button>
+      </div>
     </div>
   </div>
 
   <script>
-    let chosenAnswer = '';
-    const myPhoneNumber = "33600730882";
+    let meryemChoice = '';
 
-    function handleChoice(choice) {
-      chosenAnswer = choice;
-      document.getElementById('initial-buttons').style.display = 'none';
-      document.getElementById('next-step').style.display = 'block';
+    function startChat(choice) {
+      meryemChoice = choice;
+      document.getElementById('step-1').style.display = 'none';
+      document.getElementById('step-2').style.display = 'block';
+
+      const box = document.getElementById('chat-box');
+      box.innerHTML += `<div class="chat-msg msg-meryem"><b>Meryem:</b> ${choice}</div>`;
+      box.innerHTML += `<div class="chat-msg msg-med"><b>Mohamed:</b> raki ghya maryoma ? 🌸</div>`;
+      box.scrollTop = box.scrollHeight;
     }
 
-    function sendDiscussion() {
-      const note = document.getElementById('user-note').value;
-      if (!note.trim()) {
-        alert("S'il te plaît, écris un petit mot avant d'envoyer ! ✨");
-        return;
-      }
+    function sendMsg() {
+      const input = document.getElementById('meryem-msg');
+      const val = input.value.trim();
+      if (!val) return;
 
-      // إظهار الرسالة لمريم على الشاشة
-      document.getElementById('user-note').disabled = true;
-      document.getElementById('confirmation-msg').style.display = 'block';
+      const box = document.getElementById('chat-box');
+      box.innerHTML += `<div class="chat-msg msg-meryem"><b>Meryem:</b> ${val}</div>`;
+      input.value = '';
 
-      // إرسال النتيجة إلى رقم الواتساب الخاص بك تلقائياً
-      const messageText = `Réponse de Meryem:\n- Choix: ${chosenAnswer}\n- Question: 3ejbk cadeaux maryoma?\n- Remarque: ${note}`;
-      const whatsappUrl = `https://wa.me/${myPhoneNumber}?text=${encodeURIComponent(messageText)}`;
-      
-      setTimeout(function() {
-        window.location.href = whatsappUrl;
-      }, 1000);
+      // رد تلقائي في الصفحة بعد أن تجيب مريم
+      setTimeout(() => {
+        box.innerHTML += `<div class="chat-msg msg-med"><b>Mohamed:</b> 💖 NABGHIK MARYOMAA 💖</div>`;
+        box.scrollTop = box.scrollHeight;
+      }, 700);
     }
   </script>
 
