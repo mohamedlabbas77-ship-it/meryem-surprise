@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,126 +12,156 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%);
+      background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
       box-sizing: border-box;
     }
     .card {
-      background: white;
+      background: rgba(255, 255, 255, 0.96);
       padding: 25px 20px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      max-width: 340px;
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(233, 30, 99, 0.25);
+      max-width: 350px;
       width: 100%;
+      backdrop-filter: blur(5px);
     }
     h1 {
       color: #e91e63;
       font-size: 22px;
+      margin-top: 5px;
       margin-bottom: 15px;
     }
     .img-container {
       width: 100%;
-      border-radius: 15px;
+      border-radius: 18px;
       overflow: hidden;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      border: 3px solid #fff0f5;
     }
     .img-container img {
       width: 100%;
-      max-height: 350px;
+      height: 350px;
       object-fit: cover;
       display: block;
     }
-    .caption {
-      color: #d81b60;
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 15px;
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
     }
     .btn {
-      background: #e91e63;
+      background: linear-gradient(45deg, #ff2a75, #ff6090);
       color: white;
       border: none;
-      padding: 12px 25px;
+      padding: 12px 26px;
       font-size: 16px;
+      font-weight: bold;
       border-radius: 50px;
       cursor: pointer;
-      margin: 10px 5px;
-      box-shadow: 0 4px 10px rgba(233, 30, 99, 0.3);
-      transition: transform 0.2s;
+      box-shadow: 0 5px 15px rgba(255, 42, 117, 0.4);
+      transition: all 0.2s ease;
     }
     .btn:active {
       transform: scale(0.95);
     }
-    .btn-choice {
-      padding: 10px 20px;
-      font-size: 15px;
-    }
-    #question-section, #response-section {
+    #next-step {
       display: none;
-      margin-top: 15px;
+      margin-top: 20px;
       padding-top: 15px;
-      border-top: 1px dashed #e91e63;
+      border-top: 2px dashed #ffb6c1;
     }
-    .q-text {
-      color: #333;
+    .question-title {
+      color: #e91e63;
+      font-size: 20px;
       font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .love-msg {
+      color: #d81b60;
       font-size: 18px;
+      font-weight: bold;
       margin-bottom: 15px;
     }
-    #final-msg {
-      color: #e91e63;
-      font-size: 18px;
+    textarea {
+      width: 90%;
+      height: 80px;
+      border: 2px solid #ffccd5;
+      border-radius: 12px;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    textarea:focus {
+      border-color: #e91e63;
+    }
+    #confirmation-msg {
+      display: none;
+      color: #4caf50;
       font-weight: bold;
-      margin-top: 10px;
+      margin-top: 15px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h1>رسالة خاصة لمريم ✨</h1>
+    <h1>Surprise pour Meryem ✨</h1>
 
-    <!-- صورة وردة عالية الجودة ومباشرة من الإنترنت -->
+    <!-- صورة وردة رائعة جداً -->
     <div class="img-container">
-      <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="Rose">
-    </div>
-    <div class="caption">هذه لك وردتك 🌹✨</div>
-
-    <!-- زر كشف السؤال -->
-    <button id="show-q-btn" class="btn" onclick="showQuestion()">اضغطي هنا لمعرفة السؤال 🎁</button>
-
-    <!-- قسم السؤال والأزرار -->
-    <div id="question-section">
-      <div class="q-text">3ejbk cadeaux maryoma? 🌸</div>
-      <button class="btn btn-choice" onclick="selectAnswer('Oui')">Oui 💕</button>
-      <button class="btn btn-choice" onclick="selectAnswer('Non')">Non 😅</button>
+      <img src="https://images.unsplash.com/photo-1559563458-527698bf5295?auto=format&fit=crop&w=800&q=80" alt="Rose for Meryem">
     </div>
 
-    <!-- قسم الإجابة النهائية -->
-    <div id="response-section">
-      <div id="final-msg"></div>
+    <!-- أزرار Oui / Non أسفل الوردة مباشرة -->
+    <div id="initial-buttons" class="btn-group">
+      <button class="btn" onclick="handleChoice('Oui')">Oui 💕</button>
+      <button class="btn" onclick="handleChoice('Non')">Non 😅</button>
+    </div>
+
+    <!-- الجزء التفاعلي الذي يظهر بعد الضغط -->
+    <div id="next-step">
+      <div class="question-title">3ejbk cadeaux maryoma? 🌸</div>
+      <div class="love-msg">💖 NABGHIK MARYOMAA 💖</div>
+
+      <!-- مكان كتابة الملاحظة / المحادثة -->
+      <textarea id="user-note" placeholder="Écris une remarque ou un message ici... ✨"></textarea>
+      <br>
+      <button class="btn" onclick="sendDiscussion()">Envoyer le message 💌</button>
+      
+      <div id="confirmation-msg">Merci Maryoma ! Votre message a été envoyé ✨💖</div>
     </div>
   </div>
 
   <script>
-    function showQuestion() {
-      document.getElementById('show-q-btn').style.display = 'none';
-      document.getElementById('question-section').style.display = 'block';
+    let chosenAnswer = '';
+
+    function handleChoice(choice) {
+      chosenAnswer = choice;
+      document.getElementById('initial-buttons').style.display = 'none';
+      document.getElementById('next-step').style.display = 'block';
     }
 
-    function selectAnswer(ans) {
-      document.getElementById('question-section').style.display = 'none';
-      var resp = document.getElementById('response-section');
-      var msg = document.getElementById('final-msg');
-      
-      if (ans === 'Oui') {
-        msg.innerHTML = "💖 NABGHIK MARYOMAA 💖<br><br>أنا سعيد جداً لأنها أعجبتك! ✨🌸";
-      } else {
-        msg.innerHTML = "💖 NABGHIK MARYOMAA 💖<br><br>حتى لو ما عجبك المرة الجاية نجيبلك أحسن! 😜✨";
+    function sendDiscussion() {
+      const note = document.getElementById('user-note').value;
+      if (!note.trim()) {
+        alert("S'il te plaît, écris un petit mot avant d'envoyer ! ✨");
+        return;
       }
-      resp.style.display = 'block';
+
+      // إخفاء زر الإرسال وتأكيد وصول الرسالة
+      document.getElementById('user-note').disabled = true;
+      document.getElementById('confirmation-msg').style.display = 'block';
+
+      // فتح تطبيق الإرسال المباشر أو المحادثة إذا رغبت
+      const text = `Réponse de Meryem:\nChoix: ${chosenAnswer}\nQuestion: 3ejbk cadeaux maryoma?\nRemarque: ${note}`;
+      console.log(text);
     }
   </script>
 
