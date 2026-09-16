@@ -91,6 +91,7 @@
       font-size: 14px;
       max-width: 80%;
       word-wrap: break-word;
+      position: relative;
     }
     .msg-med {
       background: #e91e63;
@@ -104,6 +105,16 @@
       margin-right: auto;
       border: 1px solid #ffccd5;
       border-bottom-left-radius: 2px;
+    }
+    .read-status {
+      font-size: 11px;
+      margin-top: 4px;
+      text-align: right;
+      opacity: 0.8;
+    }
+    .read-status.seen {
+      color: #00d2ff;
+      font-weight: bold;
     }
     .chat-input {
       display: flex;
@@ -130,7 +141,6 @@
   <div class="card">
     <h1>Surprise pour Meryem ✨</h1>
 
-    <!-- حماية وتحميل الصورة مهما كانت صيغتها المرفوعة -->
     <div class="img-container">
       <img src="medoud.jpg" onerror="this.onerror=null; this.src='medoud.png'; this.onerror=function(){this.src='medoud.JPG'; this.onerror=function(){this.src='https://images.unsplash.com/photo-1559563458-527698bf5295?auto=format&fit=crop&w=800&q=80';}}" alt="Photo">
     </div>
@@ -144,17 +154,17 @@
       </div>
     </div>
 
-    <!-- الشات والتسلسل التفاعلي -->
+    <!-- الشات الحي مع إشارات Vu -->
     <div id="step-2">
       <div class="identity-selector">
-        <label><input type="radio" name="userRole" value="Meryem" checked> Meryem</label>
-        <label style="margin-left: 15px;"><input type="radio" name="userRole" value="Mohamed"> Mohamed</label>
+        <label><input type="radio" name="userRole" value="Meryem" checked onclick="sendReadReceipt()"> Meryem</label>
+        <label style="margin-left: 15px;"><input type="radio" name="userRole" value="Mohamed" onclick="sendReadReceipt()"> Mohamed</label>
       </div>
 
-      <div class="chat-box" id="chat-box"></div>
+      <div class="chat-box" id="chat-box" onclick="sendReadReceipt()"></div>
 
       <div class="chat-input">
-        <input type="text" id="chat-input-text" placeholder="Écris un message..." onkeypress="if(event.key==='Enter') sendLiveMessage()">
+        <input type="text" id="chat-input-text" placeholder="Écris un message..." onkeypress="if(event.key==='Enter') sendLiveMessage()" onfocus="sendReadReceipt()">
         <button class="btn" onclick="sendLiveMessage()">Envoyer</button>
       </div>
     </div>
@@ -167,13 +177,18 @@
       userId: 'user_' + Math.floor(Math.random() * 1000)
     });
 
-    const channelName = 'meryem_med_private_chat_room_v2';
+    const channelName = 'meryem_med_private_chat_room_v3';
 
     pubnub.subscribe({ channels: [channelName] });
 
     pubnub.addListener({
       message: function(m) {
-        displayMessage(m.message.sender, m.message.text);
+        if (m.message.type === 'read_receipt') {
+          markMessagesAsVu(m.message.reader);
+        } else {
+          displayMessage(m.message.id, m.message.sender, m.message.text);
+          sendReadReceipt();
+        }
       }
     });
 
@@ -181,17 +196,15 @@
       document.getElementById('step-1').style.display = 'none';
       document.getElementById('step-2').style.display = 'block';
 
-      // إرسال الإجابة الأولى للشات
       pubnub.publish({
         channel: channelName,
-        message: { sender: 'Meryem', text: `Réponse: ${choice}` }
+        message: { type: 'msg', id: Date.now(), sender: 'Meryem', text: `Réponse: ${choice}` }
       });
 
-      // إرسال السؤال الثاني فوراً في الشات
       setTimeout(() => {
         pubnub.publish({
           channel: channelName,
-          message: { sender: 'Mohamed', text: 'raki ghya maryoma ? 🌸' }
+          message: { type: 'msg', id: Date.now() + 1, sender: 'Mohamed', text: 'raki ghya maryoma ? 🌸' }
         });
       }, 500);
     }
@@ -205,26 +218,47 @@
 
       pubnub.publish({
         channel: channelName,
-        message: { sender: role, text: text }
+        message: { type: 'msg', id: Date.now(), sender: role, text: text }
       });
 
       input.value = '';
     }
 
-    function displayMessage(sender, text) {
+    function sendReadReceipt() {
+      const currentRole = document.querySelector('input[name="userRole"]:checked').value;
+      pubnub.publish({
+        channel: channelName,
+        message: { type: 'read_receipt', reader: currentRole }
+      });
+    }
+
+    function displayMessage(id, sender, text) {
       const box = document.getElementById('chat-box');
       const msgDiv = document.createElement('div');
       
       if (sender === 'Mohamed') {
         msgDiv.className = 'chat-msg msg-med';
-        msgDiv.innerHTML = `<b>Mohamed:</b> ${text}`;
+        msgDiv.dataset.sender = 'Mohamed';
+        msgDiv.innerHTML = `<b>Mohamed:</b> ${text}<div class="read-status" id="status-${id}">Envoyé ✔️</div>`;
       } else {
         msgDiv.className = 'chat-msg msg-meryem';
-        msgDiv.innerHTML = `<b>Meryem:</b> ${text}`;
+        msgDiv.dataset.sender = 'Meryem';
+        msgDiv.innerHTML = `<b>Meryem:</b> ${text}<div class="read-status" id="status-${id}">Envoyé ✔️</div>`;
       }
 
       box.appendChild(msgDiv);
       box.scrollTop = box.scrollHeight;
+    }
+
+    function markMessagesAsVu(reader) {
+      const allStatuses = document.querySelectorAll('.read-status');
+      allStatuses.forEach(st => {
+        const parentSender = st.parentElement.dataset.sender;
+        if (parentSender && parentSender !== reader) {
+          st.innerHTML = 'Vu ✔️✔️';
+          st.classList.add('seen');
+        }
+      });
     }
   </script>
 
